@@ -19,7 +19,7 @@ class Poster():
 
         # 创建海报三部分
         # 1. 比赛标题、球队图标、基本元素
-        self.game_title_background = Image.new("RGBA", (700, 500), self.background_color)
+        self.game_title_background = Image.new("RGBA", (700, 250), self.background_color)
         # 2. 分析
         self.game_anlay_background = Image.new("RGBA", (700, 1180), self.background_color)
         # 3. 预测推荐
@@ -45,9 +45,9 @@ class Poster():
         if team_icon_image.mode != "RGBA":
             team_icon_image = team_icon_image.convert("RGBA")
 
-        team_icon_image = team_icon_image.resize((200, 200))
+        team_icon_image = team_icon_image.resize((150, 150))
         icon_x = (self.width // 2 - team_icon_image.width) // 2
-        icon_y = (self.game_title_background.height // 2 - team_icon_image.height) // 2 +100
+        icon_y = (self.game_title_background.height // 2 - team_icon_image.height) // 2 + 20
         if team_type == "home":
             self.game_title_background.alpha_composite(team_icon_image, (icon_x - 50, icon_y))
         else:
@@ -56,7 +56,7 @@ class Poster():
     def draw_match_name(self):
 
         # 添加队名和比赛信息
-        font = ImageFont.truetype("msyhbd.ttc", 40)
+        font = ImageFont.truetype("msyhbd.ttc", 45)
         # textsize 是 pillow 9.5.0 版本才有
         # textsize is deprecated and will be removed in Pillow 10 (2023-07-01). Use textbbox or textlength instead.
         text_width, text_height = self.game_title_draw.textsize(self.match_name, font=font)
@@ -66,10 +66,10 @@ class Poster():
         x = (self.width - text_width) // 2
         y = (self.game_title_background.height - text_height) // 2
         #
-        self.game_title_draw.text((x, 150), self.match_name, font=font, fill=(0, 0, 0))
+        self.game_title_draw.text((x, 10), self.match_name, font=font, fill=(0, 0, 0))
 
     def draw_match_team_name(self):
-        font = ImageFont.truetype("msyhbd.ttc", 50)
+        font = ImageFont.truetype("msyhbd.ttc", 40)
         # textsize 是 pillow 9.5.0 版本才有
         # textsize is deprecated and will be removed in Pillow 10 (2023-07-01). Use textbbox or textlength instead.
 
@@ -83,17 +83,17 @@ class Poster():
         x = (self.width - text_width) // 2
         y = (self.game_title_background.height - text_height) // 2
         #
-        self.game_title_draw.text((x, 210), match_vs_text, font=font, fill=(0, 0, 0))
+        self.game_title_draw.text((x, 80), match_vs_text, font=font, fill=(0, 0, 0))
 
         # 绘制队名在图片下方
         name_font = ImageFont.truetype("msyhbd.ttc", 20)
         text_width, text_height = self.game_title_draw.textsize(self.team1_name, font=name_font)
         name_x = (self.width // 2 - text_width) // 2
-        self.game_title_draw.text((name_x - 50, 350), self.team1_name, font=name_font, fill=(0, 0, 0))
+        self.game_title_draw.text((name_x - 50, 200), self.team1_name, font=name_font, fill=(0, 0, 0))
 
         text_width, text_height = self.game_title_draw.textsize(self.team2_name, font=name_font)
         name_x = (self.width // 2 - text_width) // 2
-        self.game_title_draw.text((name_x + self.width // 2 + 50, 350), self.team2_name, font=name_font, fill=(0, 0, 0))
+        self.game_title_draw.text((name_x + self.width // 2 + 50, 200), self.team2_name, font=name_font, fill=(0, 0, 0))
 
         # x_separate_image = Image.new("RGBA", (self.width, 20), (255, 221, 102))
         # self.game_title_background.paste(x_separate_image, (0, 480), x_separate_image)
@@ -107,7 +107,7 @@ class Poster():
         # # 计算文本的位置
         x = (self.width - text_width) // 2
         y = (self.game_title_background.height - text_height) // 2
-        self.game_title_draw.text((x, 280), self.match_time, font=font, fill=(255, 17, 17))
+        self.game_title_draw.text((x, 150), self.match_time, font=font, fill=(255, 17, 17))
 
     def draw_separate(self):
         # 绘制分隔符
@@ -119,7 +119,7 @@ class Poster():
         self.game_anlay_background.paste(y_separate_image, ((self.width - y_separate_image.width) // 2, 20),
                                          y_separate_image)
 
-    def draw_long_message(self, long_text, font, begin_y, x_side,fill = (0,0,0)):
+    def draw_long_message(self, long_text, font, begin_y, x_side, fill=(0, 0, 0)):
         def wrap_text(max_width):
             """
             根据给定的最大宽度将文本分割成多行。
@@ -176,9 +176,9 @@ class Poster():
         """
         name_font = ImageFont.truetype("msyh.ttc", 25)
         name_text = team_message["name"]
-        name_color = (0,0,0)
+        name_color = (0, 0, 0)
         if team_type == "home":
-            name_color = (13,102,171)
+            name_color = (13, 102, 171)
         else:
             name_color = (241, 141, 65)
         font = ImageFont.truetype("msyh.ttc", 20)  # 微软雅黑 20号字体
@@ -194,7 +194,7 @@ class Poster():
             x_side = 365
         y_side = 10  # 上边间隔
         begin_y = 40
-        begin_y = self.draw_long_message(name_text, name_font, begin_y, x_side+20,name_color) + y_side
+        begin_y = self.draw_long_message(name_text, name_font, begin_y, x_side + 20, name_color) + y_side
         begin_y = self.draw_long_message(league_text, font, begin_y, x_side) + y_side
         begin_y = self.draw_long_message(recent_match_text, font, begin_y, x_side) + y_side
         begin_y = self.draw_long_message(recent_comp_text, font, begin_y, x_side) + y_side
@@ -208,7 +208,9 @@ class Poster():
         title_font = ImageFont.truetype("msyhbd.ttc", 35)
         content_font = ImageFont.truetype("msyh.ttc", 30)  # 微软雅黑 20号字体
         predict_title_text = "【大数据预测】"
-        predict_index_text = "推荐指数:\n胜:{}%,平:{}%,负:{}%".format(pre_info["win_advice_index"],pre_info["draw_advice_index"],pre_info["loss_advice_index"])
+        predict_index_text = "推荐指数:\n胜:{}%,平:{}%,负:{}%".format(pre_info["win_advice_index"],
+                                                                      pre_info["draw_advice_index"],
+                                                                      pre_info["loss_advice_index"])
         team_predict_text = "主队胜指数：{}, 客队胜指数 {}".format(pre_info["home_win_index"],
                                                                   pre_info["away_win_index"])
         home_team_text = "主队进球指数: {}, 失球指数: {}".format(pre_info["home_attack_index"],
@@ -217,7 +219,6 @@ class Poster():
                                                                pre_info["away_lose_index"])
         predict_goal_number_text = "预测进球数 {}".format(pre_info["all_goal_index"])
         predict_goal_text = "比分预测：{}-{}".format(pre_info["home_goal"], pre_info["away_goal"])
-
 
         x_side = 50  # 侧边间隔
 
@@ -228,7 +229,7 @@ class Poster():
         begin_y = begin_y + 60
         x_side = 120
         self.game_anlay_draw.text((80, begin_y), text=predict_index_text, font=title_font, fill=(255, 0, 0))
-        begin_y = begin_y + y_side+40
+        begin_y = begin_y + y_side + 40
         self.game_anlay_draw.text((x_side, begin_y), text=team_predict_text, font=content_font, fill=(0, 0, 0))
         begin_y = begin_y + y_side
         self.game_anlay_draw.text((x_side, begin_y), text=home_team_text, font=content_font, fill=(0, 0, 0))
@@ -238,7 +239,6 @@ class Poster():
         self.game_anlay_draw.text((x_side, begin_y), text=predict_goal_number_text, font=content_font, fill=(0, 0, 0))
         begin_y = begin_y + y_side
         self.game_anlay_draw.text((x_side, begin_y), text=predict_goal_text, font=content_font, fill=(0, 0, 0))
-
 
     def draw_author_predict(self, author_info: dict):
         title_font = ImageFont.truetype("msyhbd.ttc", 35)
@@ -271,11 +271,24 @@ class Poster():
         self.draw_team_message(com_info["away_team"], "away")  # 绘制球队信息
         self.draw_algorithm_predict(pre_info)
         self.draw_author_predict(author_info)
-        self.game_title_background.save("1111.png")
-        self.game_anlay_background.save("2222.png")
-        self.game_predict_background.save("3333.png")
-        # self.game_title_background.show()
-        self.game_anlay_background.show()
+        # self.game_title_background.save("1111.png")
+        # self.game_anlay_background.save("2222.png")
+        # self.game_predict_background.save("3333.png")
+
+        # 计算新图片的高度（两张图片的高度之和）
+        new_height = self.game_title_background.height + self.game_anlay_background.height + self.game_predict_background.height
+        # 宽度保持不变（取第一张图片的宽度）
+        new_width = self.game_title_background.width
+
+        # 创建一个新的空白图片，大小为(new_width, new_height)
+        new_img = Image.new('RGB', (new_width, new_height))
+        # 将两张图片粘贴到新图片上
+        new_img.paste(self.game_title_background, (0, 0))  # 粘贴第一张图片到(0, 0)位置
+        new_img.paste(self.game_anlay_background, (0, self.game_title_background.height))  # 粘贴第二张图片到(0, img1.height)位置
+        new_img.paste(self.game_predict_background,
+                      (0, self.game_title_background.height + self.game_anlay_background.height))
+        # 保存新图片
+        new_img.save('0000.png')
+        new_img.show()
+        # self.game_anlay_background.show()
         # self.game_predict_background.show()
-
-
