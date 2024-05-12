@@ -59,11 +59,39 @@ class FootballMatchesDatabase:
         INSERT OR REPLACE INTO football_matches ({columns})  
         VALUES ({placeholders});  
         '''
-
         try:
             # 传递所有值的列表作为参数
             params = list(match_data.values())
             self.cursor.execute(sql, params)
+            self.conn.commit()
+        except Error as e:
+            print(f"An error occurred: {e.args[0]}")
+
+    def insert_or_update_match(self, match_data):
+        # 假设match_data包含了一个名为'match_id'的键，它作为主键
+        # 并且其他键对应于表中的列，但我们只更新其中的一些
+
+        # 构造要更新的字段和值
+        update_fields = []
+        update_placeholders = []
+        for key, value in match_data.items():
+            if key != 'match_id':  # 跳过主键，因为它用于WHERE子句
+                update_fields.append(f"{key}=?")
+                update_placeholders.append(value)
+
+                # 使用UPDATE语句
+        sql = f'''  
+        UPDATE football_matches  
+        SET {', '.join(update_fields)}  
+        WHERE match_id=?;  
+        '''
+
+        # 添加主键到参数列表的末尾
+        update_placeholders.append(match_data['match_id'])
+
+        try:
+            # 传递所有值的列表作为参数
+            self.cursor.execute(sql, update_placeholders)
             self.conn.commit()
         except Error as e:
             print(f"An error occurred: {e.args[0]}")
@@ -94,6 +122,11 @@ class FootballMatchesDatabase:
         self.cursor.execute(delete_sql, (match_id,))
         self.conn.commit()
 
+    def query_not_result_matches(self):
+        query_all_sql = 'SELECT * FROM football_matches WHERE result IS NULL;'
+        self.cursor.execute(query_all_sql)
+        rows = self.cursor.fetchall()
+        return rows
 
 
 # if __name__ == "__main__":
@@ -106,6 +139,22 @@ class FootballMatchesDatabase:
 #         db.insert_or_replace_match(match_data)
 
 
-
-
-
+class DbMatchInfo():
+    def __init__(self, db_result):
+        # print(db_result)
+        self.match_id = db_result[0]
+        self.match_time = db_result[1]
+        self.match_time_stamp = db_result[2]
+        self.match_title = db_result[3]
+        self.team_a_name = db_result[4]
+        self.team_b_name = db_result[5]
+        self.team_a_info = db_result[6]
+        self.team_b_info = db_result[7]
+        self.ai_predict_info = db_result[8]
+        self.author_predict_win = db_result[9]
+        self.author_predict_goal_num = db_result[10]
+        self.author_predict_score = db_result[11]
+        self.result = db_result[12]
+        self.is_right_win = db_result[13]
+        self.is_right_goal_num = db_result[14]
+        self.is_right_score = db_result[15]

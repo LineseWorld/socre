@@ -4,7 +4,7 @@ from io import BytesIO
 
 def download_picture(url,file_name):
     # 图片的URL
-    print("name:{} url: {}".format(file_name,url))
+    # print("name:{} url: {}".format(file_name,url))
     # 使用requests库获取图片内容
     response = requests.get(url)
     response.raise_for_status()  # 如果请求失败，这里会抛出异常

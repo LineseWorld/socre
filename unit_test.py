@@ -9,8 +9,10 @@ import spider
 from draw3 import Poster
 import download
 from prediction import calculate_probabilities
-
-
+from match_result import MatchResult
+from football_matches_database import FootballMatchesDatabase,DbMatchInfo
+from dqd_crawler import *
+import contextlib
 def test_draw():
     print("test_draw")
 
@@ -76,7 +78,8 @@ def test_draw():
 
     p.show(com_info, pre_info, author_info)
 
-test_draw()
+
+# test_draw()
 
 def test_predict():
     game_id = "53637115"
@@ -95,6 +98,7 @@ def test_predict():
     # pre.GetWinPrediction()
     pre_info = pre.GetGoalPrediction()
 
+
 # test_predict()
 
 def test_calculate_probabilities():
@@ -102,7 +106,33 @@ def test_calculate_probabilities():
     #
     # print(calculate_probabilities(73.81, 33.54))
     # print(calculate_probabilities(60, 40))
-    for i in range(1,100):
-        print("team1: {} , team2 :{} , result: {}".format(i,100-i, calculate_probabilities(i, 100-i)))
+    for i in range(1, 100):
+        print("team1: {} , team2 :{} , result: {}".format(i, 100 - i, calculate_probabilities(i, 100 - i)))
+
 
 # test_calculate_probabilities()
+
+def test_update_result():
+    with FootballMatchesDatabase() as db, DongqiudiCrawler() as crawler:
+        game_id = "53637089"
+
+
+        match_info = DbMatchInfo(db.get_match_by_id(match_id=game_id))
+        if match_info is None:
+            print("not find match info ", game_id)
+            return
+
+        print(match_info)
+        print(type(match_info))
+
+        g_game_detail = crawler.get_game_detail(game_id)
+
+        header_info = GetHeaderInfo(g_game_detail)
+
+        match_result = MatchResult(header_info)
+        match_result.check_prediction(match_info)
+        print("score:{}-{}, result:{}, is_win:{}, is_gaol_num:{}, is_score:{}".format( match_result.as_a, match_result.as_b,
+              match_result.result, match_result.is_win, match_result.is_goal_num, match_result.is_score))
+
+
+test_update_result()
