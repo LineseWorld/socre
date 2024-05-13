@@ -2,6 +2,12 @@ import json
 from selenium import webdriver
 import time
 import util
+import requests
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 def GetHeaderInfo(json_data: dict):
@@ -74,12 +80,56 @@ class DongqiudiCrawler:
         new_data = new_data.replace(": True", ": true")
         return new_data
 
-    # 使用上下文管理协议（with 语句）来确保资源正确释放
+    def get_match_list_from_lottery(self):
+        url = "https://www.lottery.gov.cn/jc/index.html"
+        # 访问网页
+        self.driver.get(url)
 
-#
-# with DongqiudiCrawler() as crawler:
-#     # all_info = crawler.get_games_all_info(1)
-#     # 可以继续调用其他方法，如 get_game_detail
-#     # game_detail = crawler.get_game_detail('some_game_id')
-#     crawler.get_game_detail("53637089")
-# # 浏览器实例在 with 语句块结束后自动关闭
+        # 等待动态内容加载完成（例如，等待某个元素出现）
+        wait = WebDriverWait(self.driver, 10)
+        element = wait.until(EC.visibility_of_element_located((By.ID, "zqszData")))
+
+        # 查找table元素（如果它位于element内部）
+        # 注意：如果table元素是element的直接子元素，这种方法有效
+        # 如果不是，你可能需要递归搜索或调整定位器
+        table = element.find_element(By.TAG_NAME, 'table')
+
+        # 提取表格中的数据
+        rows = table.find_elements(By.TAG_NAME, 'tr')
+
+        result = dict()
+
+        one_day_match_list = []
+        day_key = ""
+        day_count = 0
+        for row in rows:
+            # 提取周赛事
+            headers = row.find_elements(By.CSS_SELECTOR, 'th.dateRace.text-left.p-l3')
+
+            if headers:
+                for header in headers:
+                    if day_count != 0:
+                        result[day_key] = one_day_match_list
+                    day_key = header.text
+                    day_count += 1
+                    one_day_match_list = []
+                    print(header.text)
+
+            cells = row.find_elements(By.TAG_NAME, 'td')  # 或使用'th'取决于表格结构
+            cell_texts = [cell.text for cell in cells]
+            one_match = dict()
+            if len(cell_texts) > 0:
+                one_match["number"] = cell_texts[0]
+                one_match["match_name"] = cell_texts[1]
+                one_match["team_vs_team"] = cell_texts[2]
+                one_match["match_time"] = cell_texts[3]
+
+                one_day_match_list.append(one_match)
+
+            print(cell_texts)
+
+        if day_count != 0:
+            result[day_key] = one_day_match_list
+
+        print(result)
+        return result

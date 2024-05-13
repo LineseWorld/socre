@@ -135,4 +135,12 @@ def test_update_result():
               match_result.result, match_result.is_win, match_result.is_goal_num, match_result.is_score))
 
 
-test_update_result()
+# test_update_result()
+
+
+def test_crawler_lottery():
+    with DongqiudiCrawler() as crawler:
+        crawler.get_match_list_from_lottery()
+
+
+test_crawler_lottery()
