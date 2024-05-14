@@ -140,7 +140,7 @@ def test_update_result():
 
 def test_crawler_lottery():
     with DongqiudiCrawler() as crawler:
-        crawler.get_match_list_from_lottery()
-
+        #crawler.get_match_list_from_lottery()
+        crawler.get_match_list()
 
 test_crawler_lottery()

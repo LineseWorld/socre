@@ -163,10 +163,29 @@ def generate_game_match(db: FootballMatchesDatabase, crawler: DongqiudiCrawler):
         p.show(com_info, pre_info, author_info)
 
 
+def get_ai_predict_list(crawler: DongqiudiCrawler):
+    """
+    根据将lottery的数据 生成每一张图片
+    :return:
+    """
+    lottery_dict = crawler.get_match_list_from_lottery()
+    for day, day_matches in lottery_dict.items():
+        print(f"--- {day} 的赛事 ---")
+        for match in day_matches:
+            number = match['number']
+            match_name = match['match_name']
+            team_vs_team = match['team_vs_team']
+            match_time = match['match_time']
+            print(f"赛事编号: {number}, 赛事名称: {match_name}, 对阵双方: {team_vs_team}, 比赛时间: {match_time}")
+        print()  # 在每个日期的比赛之后加一个空行，以便分隔
+
+
 if __name__ == '__main__':
     with FootballMatchesDatabase() as db, DongqiudiCrawler() as crawler:
+        get_ai_predict_list(crawler)
+
         # 更新过往比赛才开启
         # update_played_game(db, crawler)
 
 
-        generate_game_match(db, crawler)
+        # generate_game_match(db, crawler)

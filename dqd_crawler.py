@@ -80,6 +80,28 @@ class DongqiudiCrawler:
         new_data = new_data.replace(": True", ": true")
         return new_data
 
+
+    def get_match_list(self):
+        url = f'https://www.dongqiudi.com/data'
+        self.driver.get(url)
+
+        time.sleep(5)
+        # 同样使用 WebDriverWait 等待特定的条件
+        # try:
+        #     WebDriverWait(self.driver, 10).until(
+        #         EC.presence_of_element_located((By.ID, "game-detail-loaded"))
+        #     )
+        # except Exception as e:
+        #     print(f"等待元素失败: {e}")
+
+        # 获取 window.__NUXT__ 数据内容
+        nust_data = self.driver.execute_script("return window.__NUXT__;")
+        new_data = str(nust_data)
+        new_data = util.ToJsonString(new_data)
+        print(new_data)
+        json_data = json.loads(new_data)
+
+        return json_data
     def get_match_list_from_lottery(self):
         url = "https://www.lottery.gov.cn/jc/index.html"
         # 访问网页
