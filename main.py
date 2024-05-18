@@ -180,12 +180,53 @@ def get_ai_predict_list(crawler: DongqiudiCrawler):
         print()  # 在每个日期的比赛之后加一个空行，以便分隔
 
 
+def generate_ai_match_content(game_ids:[],crawler: DongqiudiCrawler):
+    for game_id in game_ids:
+        g_game_detail = crawler.get_game_detail(game_id)
+
+        # print(type(g_game_detail))
+        header_info = GetHeaderInfo(g_game_detail)
+
+        analysis_init_data = GetAnalysisInitData(g_game_detail)
+
+        com1 = Competition(header_info, analysis_init_data)
+
+        com_info = com1.GenerateTemplate()
+        print(com_info["paper_title"])
+        pre = Prediction(com1)
+        # pre.GetWinPrediction()
+        pre_info = pre.GetGoalPrediction()
+
+
+        author_info = dict()
+
+
+        p = Poster()
+        p.match_name = com_info["match_name"]
+        p.match_time = com_info["match_time"]
+
+        home_team = com_info["home_team"]
+        p.team1_name = home_team["name"]
+        p.team1_icon = "team1_icon.png"
+        download.download_picture(home_team["team_logo_url"], "team1_icon.png")
+
+        away_team = com_info["away_team"]
+        p.team2_name = away_team["name"]
+        p.team2_icon = "team2_icon.png"
+        download.download_picture(away_team["team_logo_url"], "team2_icon.png")
+
+
+        p.show_without_author(com_info, pre_info)
+
+
 if __name__ == '__main__':
+    game_ids=["53629984","53629985","53629986","53629987","53629988","53629989","53629990","53629991","53629992"]
     with FootballMatchesDatabase() as db, DongqiudiCrawler() as crawler:
-        get_ai_predict_list(crawler)
+        # get_ai_predict_list(crawler)
 
         # 更新过往比赛才开启
         # update_played_game(db, crawler)
 
 
         # generate_game_match(db, crawler)
+        generate_ai_match_content(game_ids,crawler)

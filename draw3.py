@@ -292,3 +292,34 @@ class Poster():
         new_img.show()
         # self.game_anlay_background.show()
         # self.game_predict_background.show()
+
+    def show_without_author(self,com_info, pre_info):
+        self.draw_team_icon("home")  # 绘制主队图标
+        self.draw_team_icon("away")  # 绘制客队图标
+        self.draw_match_name()  # 绘制比赛名称
+        self.draw_match_team_name()  # 绘制 主队名称V客队名称
+        self.draw_match_time()  # 绘制 比赛时间
+        self.draw_separate()  # 绘制 分隔符
+        home_team = com_info["home_team"]
+        away_team = com_info["away_team"]
+        self.draw_team_message(home_team, "home")  # 绘制球队信息
+        self.draw_team_message(away_team, "away")  # 绘制球队信息
+        self.draw_algorithm_predict(pre_info)
+
+        # 计算新图片的高度（两张图片的高度之和）
+        new_height = self.game_title_background.height + self.game_anlay_background.height
+        # 宽度保持不变（取第一张图片的宽度）
+        new_width = self.game_title_background.width
+
+        # 创建一个新的空白图片，大小为(new_width, new_height)
+        new_img = Image.new('RGB', (new_width, new_height))
+        # 将两张图片粘贴到新图片上
+        new_img.paste(self.game_title_background, (0, 0))  # 粘贴第一张图片到(0, 0)位置
+        new_img.paste(self.game_anlay_background, (0, self.game_title_background.height))  # 粘贴第二张图片到(0, img1.height)位置
+
+
+        file_name = home_team["name"]+"vs"+away_team["name"]+".png"
+        path = "./src/ai_picture/"+file_name
+        # 保存新图片
+        print("save path:",path)
+        new_img.save(path)
