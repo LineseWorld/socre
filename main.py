@@ -91,7 +91,6 @@ def update_played_game(db: FootballMatchesDatabase, crawler: DongqiudiCrawler):
 
 
 def generate_game_match(db: FootballMatchesDatabase, crawler: DongqiudiCrawler):
-
     while True:
         match_id = input("输入比赛id：")
         if match_id == "end":
@@ -180,7 +179,7 @@ def get_ai_predict_list(crawler: DongqiudiCrawler):
         print()  # 在每个日期的比赛之后加一个空行，以便分隔
 
 
-def generate_ai_match_content(game_ids:[],crawler: DongqiudiCrawler):
+def generate_ai_match_content(match_name: str, game_ids: [], crawler: DongqiudiCrawler):
     for game_id in game_ids:
         g_game_detail = crawler.get_game_detail(game_id)
 
@@ -197,10 +196,6 @@ def generate_ai_match_content(game_ids:[],crawler: DongqiudiCrawler):
         # pre.GetWinPrediction()
         pre_info = pre.GetGoalPrediction()
 
-
-        author_info = dict()
-
-
         p = Poster()
         p.match_name = com_info["match_name"]
         p.match_time = com_info["match_time"]
@@ -215,18 +210,36 @@ def generate_ai_match_content(game_ids:[],crawler: DongqiudiCrawler):
         p.team2_icon = "team2_icon.png"
         download.download_picture(away_team["team_logo_url"], "team2_icon.png")
 
+        save_path = "./src/ai_picture/" + match_name + "/"
+        p.show_without_author(save_path, com_info, pre_info)
 
-        p.show_without_author(com_info, pre_info)
+
+def get_ai_predict_list_by_table(match_name: str, crawler: DongqiudiCrawler):
+    match_table = crawler.get_all_match_table()
+    match = match_table[match_name]
+
+    schedule_url = match["schedule"]
+    match_content =  crawler.get_current_schedule_match(schedule_url)
+    match_content = match_content["content"]
+    schedule_matches = match_content["matches"]
+    match_ids = []
+    for schedule_match in schedule_matches:
+        match_id = schedule_match["match_id"]
+        status = schedule_match["status"]
+        if status == "Fixture":
+            match_ids.append(match_id)
+
+    generate_ai_match_content(match_name, match_ids, crawler)
 
 
 if __name__ == '__main__':
-    game_ids=["53629984","53629985","53629986","53629987","53629988","53629989","53629990","53629991","53629992"]
+    # game_ids=["53618789","53618788","53618787","53618786","53618785","53618784","53618782","53618781","53618783"]
     with FootballMatchesDatabase() as db, DongqiudiCrawler() as crawler:
+        get_ai_predict_list_by_table("英超", crawler)
         # get_ai_predict_list(crawler)
 
         # 更新过往比赛才开启
         # update_played_game(db, crawler)
 
-
         # generate_game_match(db, crawler)
-        generate_ai_match_content(game_ids,crawler)
+        # generate_ai_match_content(game_ids,crawler)

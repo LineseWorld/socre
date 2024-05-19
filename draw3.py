@@ -293,7 +293,7 @@ class Poster():
         # self.game_anlay_background.show()
         # self.game_predict_background.show()
 
-    def show_without_author(self,com_info, pre_info):
+    def show_without_author(self,save_path,com_info, pre_info):
         self.draw_team_icon("home")  # 绘制主队图标
         self.draw_team_icon("away")  # 绘制客队图标
         self.draw_match_name()  # 绘制比赛名称
@@ -319,7 +319,7 @@ class Poster():
 
 
         file_name = home_team["name"]+"vs"+away_team["name"]+".png"
-        path = "./src/ai_picture/"+file_name
+        path = save_path+file_name
         # 保存新图片
         print("save path:",path)
         new_img.save(path)

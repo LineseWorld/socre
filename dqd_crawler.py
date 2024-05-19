@@ -55,14 +55,8 @@ class DongqiudiCrawler:
         url = f'https://www.dongqiudi.com/liveDetail/{game_id}'
         self.driver.get(url)
 
-        time.sleep(5)
-        # 同样使用 WebDriverWait 等待特定的条件
-        # try:
-        #     WebDriverWait(self.driver, 10).until(
-        #         EC.presence_of_element_located((By.ID, "game-detail-loaded"))
-        #     )
-        # except Exception as e:
-        #     print(f"等待元素失败: {e}")
+        wait = WebDriverWait(self.driver, 10)
+        element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "match-info")))
 
         # 获取 window.__NUXT__ 数据内容
         nust_data = self.driver.execute_script("return window.__NUXT__;")
@@ -80,28 +74,38 @@ class DongqiudiCrawler:
         new_data = new_data.replace(": True", ": true")
         return new_data
 
-
-    def get_match_list(self):
+    def get_all_match_table(self):
         url = f'https://www.dongqiudi.com/data'
         self.driver.get(url)
 
-        time.sleep(5)
-        # 同样使用 WebDriverWait 等待特定的条件
-        # try:
-        #     WebDriverWait(self.driver, 10).until(
-        #         EC.presence_of_element_located((By.ID, "game-detail-loaded"))
-        #     )
-        # except Exception as e:
-        #     print(f"等待元素失败: {e}")
+        # 等待动态内容加载完成（例如，等待某个元素出现）
+        wait = WebDriverWait(self.driver, 10)
+        element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "tab-con")))
 
         # 获取 window.__NUXT__ 数据内容
         nust_data = self.driver.execute_script("return window.__NUXT__;")
         new_data = str(nust_data)
         new_data = util.ToJsonString(new_data)
-        print(new_data)
+        # print(new_data)
         json_data = json.loads(new_data)
+        json_data = json_data["data"]
+        json_data = json_data[1]
+        tab_list = json_data["tabList"]
+        match_table = dict()
 
-        return json_data
+        for tab in tab_list:
+            key = tab["label"]
+            sub_tabs = tab["sub_tabs"]
+            match_data = dict()
+            for sub_tab in sub_tabs:
+                type = sub_tab["type"]
+                url = sub_tab["url"]
+                if len(type) == 0:
+                    continue
+                match_data[type] = url
+            match_table[key] = match_data
+        return match_table
+
     def get_match_list_from_lottery(self):
         url = "https://www.lottery.gov.cn/jc/index.html"
         # 访问网页
@@ -155,3 +159,9 @@ class DongqiudiCrawler:
 
         print(result)
         return result
+
+    def get_current_schedule_match(self,schedule_url:str):
+        response = requests.get(schedule_url)
+        json_data = response.json()
+        print(json_data)
+        return json_data
